@@ -16,5 +16,6 @@ editor: visual
 ### a. Import data
 
 ```{r}
-#| code-fold: true
+#| code-fold: true 
+#| 
 ```
