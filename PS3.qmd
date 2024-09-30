@@ -1,0 +1,20 @@
+---
+title: "Stats_506_PS3"
+author: "Yannan Niu"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+---
+
+## Github Link
+
+<https://github.com/nynn7747/Stats_506_PS3>
+
+## Problem 1
+
+### a. Import data
+
+```{r}
+#| code-fold: true
+```
