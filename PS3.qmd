@@ -19,3 +19,8 @@ editor: visual
 #| code-fold: true 
 #| 
 ```
+
+```{r}
+library(gitcreds)
+gitcreds_set()
+```
