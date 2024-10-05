@@ -13,14 +13,311 @@ editor: visual
 
 ## Problem 1
 
-### a. Import data
+### a. Import data and merge as one dataframe
 
 ```{r}
 #| code-fold: true 
-#| 
+
+library(haven)
+# Use read_xpt to import SAS data into R
+VIX <- read_xpt(
+  "/Users/nynn/Library/CloudStorage/OneDrive-Umich/Umich course/2024_Fall/Stats 506/Stats_506_PS3/Stats_506_PS3/VIX_D.xpt",
+  col_select = NULL,
+  skip = 0,
+  n_max = Inf,
+  .name_repair = "unique"
+)
+DEMO <- read_xpt(
+  "/Users/nynn/Library/CloudStorage/OneDrive-Umich/Umich course/2024_Fall/Stats 506/Stats_506_PS3/Stats_506_PS3/DEMO_D.xpt",
+  col_select = NULL,
+  skip = 0,
+  n_max = Inf,
+  .name_repair = "unique"
+)
+
+head(VIX)
+head(DEMO)
+
+# Merge VIX and DEMO based on SEQN
+merged_data <- merge(VIX, DEMO, by = "SEQN", all = FALSE)
+print(nrow(merged_data))
 ```
 
+### b. Proportion (%) of Respondents Wearing Glasses/Contacts by Age Groups
+
 ```{r}
-library(gitcreds)
-gitcreds_set()
+#| code-fold: true 
+library(dplyr)
+library(knitr)
+head(merged_data$RIDAGEYR)
+head(merged_data$VIQ220)
+# Add a row for the gae group by 10-years
+glass_dist <- merged_data %>%
+  select(RIDAGEYR, VIQ220) %>%
+  mutate(age_group = cut(RIDAGEYR, breaks = seq(0, 100, by = 10), right = FALSE, include.lowest = TRUE)) 
+head(glass_dist)
+
+# Create the proportions table with margins
+glass_dist_table <- prop.table(table(glass_dist$age_group, glass_dist$VIQ220, useNA = "always"), margin = 1)
+glass_dist_df <- as.data.frame.matrix(glass_dist_table[2:9, ])
+rownames(glass_dist_df) <- c("10 ~ 19", "20 ~ 29", "30 ~ 39", "40 ~ 49", "50 ~ 59", "60 ~ 69",
+                             "70 ~ 79", "80 ~ 89")
+colnames(glass_dist_df) <- c("Yes", "No", "Don't Know", "Missing")
+# Change to proportion
+glass_dist_df <- round(glass_dist_df * 100, 2)
+
+# Print the table using kable 
+kable(glass_dist_df, format = "html",
+      caption = "Proportion (%) of Respondents Wearing Glasses/Contacts by Age Groups",
+      align = "c")
+```
+
+### c. Fit three logistic regression models predicting whether a respondent wears glasses/contact lenses for distance vision. Predictors:
+
+1.  age
+
+2.  age, race, gender
+
+3.  age, race, gender, Poverty Income ratio
+
+```{r}
+#| code-fold: true 
+# Remove NAs and don't know in VIQ220, and change to binary values
+fit_data <- merged_data[c("VIQ220", "RIDAGEYR", "RIDRETH1", "DMDHRGND", "INDFMPIR")] %>%
+  filter(VIQ220 == 1 | VIQ220 == 2) %>%
+  mutate(VIQ220 = VIQ220 - 1,
+         RIDRETH1 = as.factor(RIDRETH1),
+         DMDHRGND = as.factor(DMDHRGND))
+colnames(fit_data) <- c("Dist", "Age", "Race/Ethnicity", "Gender", "Family PIR")
+head(fit_data)
+
+form1 <- as.formula(Dist ~ Age)
+form2 <- as.formula(Dist ~ Age + `Race/Ethnicity` + Gender)
+form3 <- as.formula(Dist ~ Age + `Race/Ethnicity` + Gender + `Family PIR`)
+
+model1 <- glm(form1, 
+              data = na.omit(fit_data %>% select(Dist, Age)), 
+              family = "binomial")
+model2 <- glm(form2, 
+              data = na.omit(fit_data %>% select(Dist, Age, `Race/Ethnicity`, Gender)), 
+              family = "binomial")
+model3 <- glm(form3, 
+              data = na.omit(fit_data %>% select(Dist, Age, `Race/Ethnicity`, Gender, `Family PIR`)), 
+              family = "binomial")
+
+# Extract odds ratios (exp(coef)), 95% confidence intervals, and other info 
+# A function to extract OR
+extract_or <- function(model, model_name) {
+  or_df <- as.data.frame(round(exp(cbind(coef(model), confint.default(model))), 2))
+  or_df$Model <- model_name
+  or_df$Predictor <- rownames(or_df)
+  or_df$`Sample Size` <- nobs(model)
+  or_df$AIC <- round(AIC(model), 2)
+  or_df$Pseudo_R2 <- round(1 - model$deviance / model$null.deviance, 2)
+  
+  return(or_df)
+}
+
+# Apply the function to each model
+or_model1 <- extract_or(model1, "Model 1")
+or_model2 <- extract_or(model2, "Model 2")
+or_model3 <- extract_or(model3, "Model 3")
+
+# Bind the three models together into one data frame
+all_models <- rbind(or_model1, or_model2, or_model3)
+colnames(all_models) <- c("Odds Ratio", "2.5% CI", "97.5% CI", "Model", 
+                          "Predictor", "Sample Size", "AIC", "R2")
+all_models <- all_models %>%
+  select(Model, `Sample Size`, `AIC`, `R2`, Predictor, `Odds Ratio`, `2.5% CI`, `97.5% CI`)
+
+# Bind OR and other info in one table, and remove duplicated values
+Result_table <- all_models %>%  
+  mutate(
+      across(c(Model, `Sample Size`, AIC, R2), 
+             ~ ifelse(duplicated(paste(Model, `Sample Size`, AIC, R2)), "", .))
+    )
+  
+kable(Result_table, caption = "Estimated OR and Model Information for Three Logistic Regression Models", row.names = FALSE)
+```
+
+### d. From the third model from the previous part, test whether the odds of men and women being wears of glasess/contact lenses for distance vision differs. Test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women. Include the results of the each test and their interpretation.
+
+\(1\) From model:
+
+Yes, the odds of men and women being wears of glasess/contact lenses for distance vision have significant difference, given the *p*-value for the test is 7.03e-05 which is less than 0.05. Based on the estimation of OR 0.80, females have 20% lower odds of wearing glasess/contact lenses for distance vision compared to men.
+
+\(2\) Test for proportion:
+
+Yes, given the *p*-value is 0.0255 which is less than 0.05, the proportion of wearers of glasses/contact lenses for distance vision have significant difference between men and women
+
+```{r}
+#| code-fold: true 
+# Model result test
+library(multcomp)
+summary(glht(model3, "Gender2 = 0"))
+round(exp(coef(glht(model3, "Gender2 = 0"))),2)
+
+
+# Proportion test
+data_model3 <- na.omit(fit_data[c("Dist", "Age", "Race/Ethnicity", "Gender", "Family PIR")])
+gender_glasses_table <- table(data_model3$Dist, data_model3$Gender)
+prop_test <- prop.test(gender_glasses_table)
+print(prop_test)
+```
+
+## Problem 2
+
+### a. What year is the oldest movie from, and how many movies were released in that year? Answer this with a single SQL query.
+
+The oldest year is 2006 and 1000 movies were released in this year.
+
+```{r}
+#| code-fold: true 
+library(DBI)  
+sakila <- dbConnect(RSQLite::SQLite(), "/Users/nynn/Library/CloudStorage/OneDrive-Umich/Umich course/2024_Fall/Stats 506/Stats_506_PS3/Stats_506_PS3/sakila_master.db")
+dbListTables(sakila)
+dbListFields(sakila, "film")
+dbGetQuery(sakila,
+           "SELECT release_year, COUNT(film_id) AS no_released 
+              FROM film
+              GROUP BY release_year
+              ORDER BY release_year ASC
+           LIMIT 1")
+```
+
+For each of the following questions, solve them in two ways: First, use SQL query or queries to extract the appropriate table(s), then use regular R operations on those `data.frame`s to answer the question. Second, use a single SQL query to answer the question.
+
+### b. What genre of movie is the least common in the data, and how many movies are of this genre?
+
+The music film is the least common in the data and there are 51 movies in this genre.
+
+```{r}
+#| code-fold: true 
+# R version
+cat_film <- dbGetQuery(sakila, "SELECT * FROM film_category")
+cat <- dbGetQuery(sakila, "SELECT * FROM category")
+head(cat)
+head(cat_film)
+merge_cat <- merge(cat_film, cat, by = "category_id") %>%
+  group_by(category_id) %>%
+  summarise(n = n_distinct(film_id), cat = unique(name)) %>%
+  arrange(n)
+head(merge_cat)
+
+# SQL version
+dbGetQuery(sakila, 
+           "SELECT f.category_id, COUNT(f.film_id) AS no_film, c.name
+              FROM film_category AS f
+              INNER JOIN category AS c
+                ON f.category_id = c.category_id
+              GROUP BY f.category_id
+              ORDER BY no_film ASC")
+```
+
+### c. Identify which country or countries have exactly 13 customers.
+
+Both Argentina and Nigeria have exactly 13 customers.
+
+```{r}
+#| code-fold: true 
+# R version
+city <- dbGetQuery(sakila, "SELECT * FROM city")
+country <- dbGetQuery(sakila, "SELECT * FROM country")
+address <- dbGetQuery(sakila, "SELECT * FROM address")
+customer <- dbGetQuery(sakila, "SELECT * FROM customer")
+
+country_city <- merge(country, city, by = "country_id", all.x = TRUE)
+country_address <- merge(country_city, address, by = "city_id", all.x = TRUE)
+country_customer <- merge(country_address, customer, by = "address_id", all.y = TRUE)
+country_customer <- as_tibble(country_customer, .name_repair = "minimal")
+
+country_customer[c("country_id", "customer_id", "country")] %>%
+  group_by(country_id) %>%
+  summarise(n_cust = n_distinct(customer_id, na.rm = TRUE), country = unique(country)) %>%
+  filter(n_cust == 13)
+
+# SQL version
+dbGetQuery(sakila, 
+           "SELECT con.country_id, COUNT(cus.customer_id) AS no_cust, con.country
+              FROM customer AS cus
+              LEFT JOIN address AS a
+                ON cus.address_id = a.address_id
+                LEFT JOIN city as ci
+                  ON a.city_id = ci.city_id
+                  LEFT JOIN country as con
+                    ON ci.country_id = con.country_id
+              GROUP BY con.country_id
+              HAVING no_cust = 13")
+
+```
+
+# Problem 3
+
+### a. What proportion of email addresses are hosted at a domain with TLD “.com”? (in the email, “angrycat\@freemail.org”, “freemail.org” is the domain, and “.org” is the TLD (top-level domain).)
+
+73.2% of email addresses are hosted at the domain with TLD ".com".
+
+```{r}
+us_500 <- read.csv("/Users/nynn/Library/CloudStorage/OneDrive-Umich/Umich course/2024_Fall/Stats 506/Stats_506_PS3/Stats_506_PS3/us-500.csv")
+head(us_500)
+# Extract domains after @ by replace all info before @ with ""
+us_500_domain <- us_500 %>%
+  mutate(domain = sub(".*@", "", email))
+head(us_500_domain$domain)
+prop <- round(100 * sum(grepl("\\.com$", us_500_domain$domain)) / length(us_500_domain$domain), 2)
+print(prop)
+
+```
+
+### b. What proportion of email addresses have at least one non alphanumeric character in them? (Excluding the required “`@`” and “`.`” found in every email address.)
+
+24.8% of email addresses have at least one non alphanumeric character in them.
+
+```{r}
+# Find non alphanumeric and non @ and . with [^a-zA-Z@.]
+prop <- round(100 * sum(grepl("[^a-zA-Z@.]", us_500$email)) / length(us_500$email), 2)
+print(prop)
+
+```
+
+### c. What are the top 5 most common area codes amongst all phone numbers? (The area code is the first three digits of a standard 10-digit telephone number.)
+
+The most common area codes among all phone numbers are 973, 212, 215, 410, and 201.
+
+```{r}
+# Get area codes from phone 1 and 2
+us_500_area <- us_500 %>%
+  mutate(area1 = substr(phone1, 1, 3),
+         area2 = substr(phone2, 1, 3))
+
+area <- data.frame(all_area = c(us_500_area$area1, us_500_area$area2))
+# Group by all area codes and arrange desc
+area %>%
+  group_by(all_area) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 5)
+```
+
+### d. Produce a histogram of the log of the apartment numbers for all addresses. (You may assume any number at the end of the an address is an apartment number.)
+
+```{r}
+library(ggplot2)
+# Replace all words before numbers
+us_500_apt <- us_500 %>%
+  mutate(apt = as.numeric(sub(".*[^0-9]([0-9]+)$", "\\1", address)))
+# Filter NAs in APT numbers
+apt <- us_500_apt %>%
+  filter(!is.na(apt))
+# Create the histogram
+ggplot(apt, aes(x = log(apt))) +
+  geom_histogram(binwidth = 1, fill = "darkblue", color = "black") +
+  labs(title = "Histogram of Log of Apartment Numbers", x = "Log of Apartment Number", y = "Frequency") +
+  theme_minimal()
+```
+
+### e. Benford’s law is an observation about the distribution of the leading digit of real numerical data. Examine whether the apartment numbers appear to follow Benford’s law. Do you think the apartment numbers would pass as real data?
+
+```{r}
+
 ```
