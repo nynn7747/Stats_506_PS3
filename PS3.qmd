@@ -1,6 +1,6 @@
 ---
 title: "Stats_506_PS3"
-author: "Yannan Niu"
+author: "Annie Yannan Niu"
 format: 
   html:
     embed-resources: true
@@ -85,7 +85,7 @@ kable(glass_dist_df, format = "html",
 # Remove NAs and don't know in VIQ220, and change to binary values
 fit_data <- merged_data[c("VIQ220", "RIDAGEYR", "RIDRETH1", "DMDHRGND", "INDFMPIR")] %>%
   filter(VIQ220 == 1 | VIQ220 == 2) %>%
-  mutate(VIQ220 = VIQ220 - 1,
+  mutate(VIQ220 = abs(VIQ220 - 2),
          RIDRETH1 = as.factor(RIDRETH1),
          DMDHRGND = as.factor(DMDHRGND))
 colnames(fit_data) <- c("Dist", "Age", "Race/Ethnicity", "Gender", "Family PIR")
@@ -146,7 +146,7 @@ kable(Result_table, caption = "Estimated OR and Model Information for Three Logi
 
 \(1\) From model:
 
-Yes, the odds of men and women being wears of glasess/contact lenses for distance vision have significant difference, given the *p*-value for the test is 7.03e-05 which is less than 0.05. Based on the estimation of OR 0.80, females have 20% lower odds of wearing glasess/contact lenses for distance vision compared to men.
+Yes, the odds of men and women being wears of glasess/contact lenses for distance vision have significant difference, given the *p*-value for the test is 7.03e-05 which is less than 0.05. Based on the estimation of OR 1.24, females have 24% higher odds of wearing glasess/contact lenses for distance vision compared to men.
 
 \(2\) Test for proportion:
 
@@ -278,12 +278,14 @@ print(prop)
 
 ### b. What proportion of email addresses have at least one non alphanumeric character in them? (Excluding the required “`@`” and “`.`” found in every email address.)
 
-24.8% of email addresses have at least one non alphanumeric character in them.
+50.6% of email addresses have at least one non alphanumeric character in them.
 
 ```{r}
 #| code-fold: true 
 # Find non alphanumeric and non @ and . with [^a-zA-Z@.]
-prop <- round(100 * sum(grepl("[^a-zA-Z@.]", us_500$email)) / length(us_500$email), 2)
+us_500_emailname <- us_500 %>%
+  mutate(emailname = sub("@.*", "", email))
+prop <- round(100 * sum(grepl("[^a-zA-Z0-9]", us_500_emailname$emailname)) / length(us_500_emailname$emailname), 2)
 print(prop)
 
 ```

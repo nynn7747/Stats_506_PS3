@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Yannan Niu">
+<meta name="author" content="Annie Yannan Niu">
 
 <title>Stats_506_PS3</title>
 <style>
@@ -3086,7 +3086,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Yannan Niu </p>
+             <p>Annie Yannan Niu </p>
           </div>
   </div>
     
@@ -3338,7 +3338,7 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove NAs and don&#39;t know in VIQ220, and change to binary values</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>fit_data <span class="ot">&lt;-</span> merged_data[<span class="fu">c</span>(<span class="st">&quot;VIQ220&quot;</span>, <span class="st">&quot;RIDAGEYR&quot;</span>, <span class="st">&quot;RIDRETH1&quot;</span>, <span class="st">&quot;DMDHRGND&quot;</span>, <span class="st">&quot;INDFMPIR&quot;</span>)] <span class="sc">%&gt;%</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(VIQ220 <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> VIQ220 <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">VIQ220 =</span> VIQ220 <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">VIQ220 =</span> <span class="fu">abs</span>(VIQ220 <span class="sc">-</span> <span class="dv">2</span>),</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">RIDRETH1 =</span> <span class="fu">as.factor</span>(RIDRETH1),</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">DMDHRGND =</span> <span class="fu">as.factor</span>(DMDHRGND))</span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(fit_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Dist&quot;</span>, <span class="st">&quot;Age&quot;</span>, <span class="st">&quot;Race/Ethnicity&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Family PIR&quot;</span>)</span>
@@ -3346,12 +3346,12 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Dist Age Race/Ethnicity Gender Family PIR
-1    1  15              4      1       2.71
-2    0  44              4      1       4.65
-3    0  70              3      1       5.00
-4    0  16              4      1       5.00
-5    0  73              3      1         NA
-6    1  18              2      2       4.91</code></pre>
+1    0  15              4      1       2.71
+2    1  44              4      1       4.65
+3    1  70              3      1       5.00
+4    1  16              4      1       5.00
+5    1  73              3      1         NA
+6    0  18              2      2       4.91</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
@@ -3437,9 +3437,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;">8475.89</td>
 <td style="text-align: left;">0.05</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">3.53</td>
-<td style="text-align: right;">3.18</td>
-<td style="text-align: right;">3.92</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.31</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3447,9 +3447,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Age</td>
-<td style="text-align: right;">0.98</td>
-<td style="text-align: right;">0.97</td>
-<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.03</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Model 2</td>
@@ -3457,9 +3457,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;">8365.02</td>
 <td style="text-align: left;">0.06</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">5.07</td>
-<td style="text-align: right;">4.39</td>
-<td style="text-align: right;">5.86</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.23</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3467,9 +3467,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Age</td>
-<td style="text-align: right;">0.98</td>
-<td style="text-align: right;">0.98</td>
-<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.02</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3477,9 +3477,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>2</td>
-<td style="text-align: right;">0.86</td>
-<td style="text-align: right;">0.63</td>
-<td style="text-align: right;">1.19</td>
+<td style="text-align: right;">1.16</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">1.60</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3487,9 +3487,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>3</td>
-<td style="text-align: right;">0.52</td>
-<td style="text-align: right;">0.46</td>
-<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">1.92</td>
+<td style="text-align: right;">1.67</td>
+<td style="text-align: right;">2.20</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3497,9 +3497,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>4</td>
-<td style="text-align: right;">0.81</td>
-<td style="text-align: right;">0.69</td>
-<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">1.24</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">1.44</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3507,9 +3507,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>5</td>
-<td style="text-align: right;">0.51</td>
-<td style="text-align: right;">0.39</td>
-<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">1.95</td>
+<td style="text-align: right;">1.50</td>
+<td style="text-align: right;">2.54</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3517,9 +3517,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Gender2</td>
-<td style="text-align: right;">0.82</td>
-<td style="text-align: right;">0.74</td>
-<td style="text-align: right;">0.91</td>
+<td style="text-align: right;">1.22</td>
+<td style="text-align: right;">1.10</td>
+<td style="text-align: right;">1.35</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Model 3</td>
@@ -3527,9 +3527,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;">7985.51</td>
 <td style="text-align: left;">0.06</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">6.09</td>
-<td style="text-align: right;">5.16</td>
-<td style="text-align: right;">7.18</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.19</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3537,9 +3537,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Age</td>
-<td style="text-align: right;">0.98</td>
-<td style="text-align: right;">0.98</td>
-<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1.02</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3547,9 +3547,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>2</td>
-<td style="text-align: right;">0.90</td>
-<td style="text-align: right;">0.65</td>
-<td style="text-align: right;">1.25</td>
+<td style="text-align: right;">1.11</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">1.54</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3557,9 +3557,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>3</td>
-<td style="text-align: right;">0.62</td>
-<td style="text-align: right;">0.53</td>
-<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">1.62</td>
+<td style="text-align: right;">1.40</td>
+<td style="text-align: right;">1.87</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3567,9 +3567,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>4</td>
-<td style="text-align: right;">0.85</td>
-<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">1.17</td>
 <td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.37</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3577,9 +3577,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Race/Ethnicity</code>5</td>
-<td style="text-align: right;">0.58</td>
-<td style="text-align: right;">0.44</td>
-<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">1.73</td>
+<td style="text-align: right;">1.31</td>
+<td style="text-align: right;">2.27</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
@@ -3587,9 +3587,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Gender2</td>
-<td style="text-align: right;">0.80</td>
-<td style="text-align: right;">0.72</td>
-<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">1.24</td>
+<td style="text-align: right;">1.12</td>
+<td style="text-align: right;">1.38</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"></td>
@@ -3597,9 +3597,9 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><code>Family PIR</code></td>
-<td style="text-align: right;">0.89</td>
-<td style="text-align: right;">0.86</td>
-<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">1.12</td>
+<td style="text-align: right;">1.08</td>
+<td style="text-align: right;">1.16</td>
 </tr>
 </tbody>
 </table>
@@ -3609,7 +3609,7 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <section id="d.-from-the-third-model-from-the-previous-part-test-whether-the-odds-of-men-and-women-being-wears-of-glasesscontact-lenses-for-distance-vision-differs.-test-whether-the-proportion-of-wearers-of-glassescontact-lenses-for-distance-vision-differs-between-men-and-women.-include-the-results-of-the-each-test-and-their-interpretation." class="level3">
 <h3 class="anchored" data-anchor-id="d.-from-the-third-model-from-the-previous-part-test-whether-the-odds-of-men-and-women-being-wears-of-glasesscontact-lenses-for-distance-vision-differs.-test-whether-the-proportion-of-wearers-of-glassescontact-lenses-for-distance-vision-differs-between-men-and-women.-include-the-results-of-the-each-test-and-their-interpretation.">d. From the third model from the previous part, test whether the odds of men and women being wears of glasess/contact lenses for distance vision differs. Test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women. Include the results of the each test and their interpretation.</h3>
 <p>(1) From model:</p>
-<p>Yes, the odds of men and women being wears of glasess/contact lenses for distance vision have significant difference, given the <em>p</em>-value for the test is 7.03e-05 which is less than 0.05. Based on the estimation of OR 0.80, females have 20% lower odds of wearing glasess/contact lenses for distance vision compared to men.</p>
+<p>Yes, the odds of men and women being wears of glasess/contact lenses for distance vision have significant difference, given the <em>p</em>-value for the test is 7.03e-05 which is less than 0.05. Based on the estimation of OR 1.24, females have 24% higher odds of wearing glasess/contact lenses for distance vision compared to men.</p>
 <p>(2) Test for proportion:</p>
 <p>Yes, given the <em>p</em>-value is 0.0255 which is less than 0.05, the proportion of wearers of glasses/contact lenses for distance vision have significant difference between men and women</p>
 <div class="cell">
@@ -3661,7 +3661,7 @@ Fit: glm(formula = form3, family = &quot;binomial&quot;, data = na.omit(fit_data
 
 Linear Hypotheses:
              Estimate Std. Error z value Pr(&gt;|z|)    
-Gender2 == 0 -0.21811    0.05487  -3.975 7.03e-05 ***
+Gender2 == 0  0.21811    0.05487   3.975 7.03e-05 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 (Adjusted p values reported -- single-step method)</code></pre>
@@ -3672,7 +3672,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Gender2 
-    0.8 </code></pre>
+   1.24 </code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
@@ -3690,10 +3690,10 @@ data:  gender_glasses_table
 X-squared = 4.9897, df = 1, p-value = 0.0255
 alternative hypothesis: two.sided
 95 percent confidence interval:
- -0.053967507 -0.003465416
+ 0.003465416 0.053967507
 sample estimates:
    prop 1    prop 2 
-0.5419962 0.5707127 </code></pre>
+0.5707127 0.5419962 </code></pre>
 </div>
 </div>
 </section>
@@ -3949,16 +3949,18 @@ column names &#39;last_update.x&#39;, &#39;last_update.y&#39; are duplicated in 
 </section>
 <section id="b.-what-proportion-of-email-addresses-have-at-least-one-non-alphanumeric-character-in-them-excluding-the-required-and-.-found-in-every-email-address." class="level3">
 <h3 class="anchored" data-anchor-id="b.-what-proportion-of-email-addresses-have-at-least-one-non-alphanumeric-character-in-them-excluding-the-required-and-.-found-in-every-email-address.">b. What proportion of email addresses have at least one non alphanumeric character in them? (Excluding the required “<code>@</code>” and “<code>.</code>” found in every email address.)</h3>
-<p>24.8% of email addresses have at least one non alphanumeric character in them.</p>
+<p>50.6% of email addresses have at least one non alphanumeric character in them.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find non alphanumeric and non @ and . with [^a-zA-Z@.]</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>prop <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">sum</span>(<span class="fu">grepl</span>(<span class="st">&quot;[^a-zA-Z@.]&quot;</span>, us_500<span class="sc">$</span>email)) <span class="sc">/</span> <span class="fu">length</span>(us_500<span class="sc">$</span>email), <span class="dv">2</span>)</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(prop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>us_500_emailname <span class="ot">&lt;-</span> us_500 <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">emailname =</span> <span class="fu">sub</span>(<span class="st">&quot;@.*&quot;</span>, <span class="st">&quot;&quot;</span>, email))</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>prop <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">sum</span>(<span class="fu">grepl</span>(<span class="st">&quot;[^a-zA-Z0-9]&quot;</span>, us_500_emailname<span class="sc">$</span>emailname)) <span class="sc">/</span> <span class="fu">length</span>(us_500_emailname<span class="sc">$</span>emailname), <span class="dv">2</span>)</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(prop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 24.8</code></pre>
+<pre><code>[1] 50.6</code></pre>
 </div>
 </div>
 </section>
